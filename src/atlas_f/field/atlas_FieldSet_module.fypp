@@ -440,7 +440,7 @@ subroutine set_device_needs_update_idx(this, field_indices, value)
   use atlas_field_c_binding
   use atlas_Field_module, only: atlas_Field
   class(atlas_FieldSet), intent(inout) :: this
-  integer, intent(in), optional :: field_indices(:)
+  integer, intent(in) :: field_indices(:)
   logical, intent(in), optional :: value
   type(atlas_Field) :: field
   integer :: i, value_int
@@ -450,17 +450,10 @@ subroutine set_device_needs_update_idx(this, field_indices, value)
       value_int = 0
     end if
   end if
-  if (present(field_indices)) then
-    do i = 1, size(field_indices)
-      field = this%field(field_indices(i))
-      call atlas__Field__set_device_needs_update(field%CPTR_PGIBUG_A, value_int)
-    end do
-  else
-    do i = 1, this%size()
-      field = this%field(i)
-      call atlas__Field__set_device_needs_update(field%CPTR_PGIBUG_A, value_int)
-    end do
-  end if
+  do i = 1, size(field_indices)
+    field = this%field(field_indices(i))
+    call atlas__Field__set_device_needs_update(field%CPTR_PGIBUG_A, value_int)
+  end do
 end subroutine
 
 !-------------------------------------------------------------------------------
