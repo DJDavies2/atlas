@@ -351,12 +351,13 @@ end subroutine
 !-------------------------------------------------------------------------------
 
 subroutine set_host_needs_update_value(this, value)
+  use, intrinsic :: iso_c_binding, only : c_int
   use atlas_field_c_binding
   use atlas_Field_module, only: atlas_Field
   class(atlas_FieldSet), intent(inout) :: this
   logical, intent(in), optional :: value
   type(atlas_Field) :: field
-  integer :: i, value_int
+  integer(c_int) :: i, value_int
   value_int = 1
   if (present(value)) then
     if (.not. value) then
@@ -372,13 +373,14 @@ end subroutine
 !-------------------------------------------------------------------------------
 
 subroutine set_host_needs_update_idx(this, field_indices, value)
+  use, intrinsic :: iso_c_binding, only : c_int
   use atlas_field_c_binding
   use atlas_Field_module, only: atlas_Field
   class(atlas_FieldSet), intent(inout) :: this
   integer, intent(in) :: field_indices(:)
   logical, intent(in), optional :: value
   type(atlas_Field) :: field
-  integer :: i, value_int
+  integer(c_int) :: i, value_int
   value_int = 1
   if (present(value)) then
     if (.not. value) then
@@ -394,13 +396,14 @@ end subroutine
 !-------------------------------------------------------------------------------
 
 subroutine set_host_needs_update_name(this, field_names, value)
+  use, intrinsic :: iso_c_binding, only : c_int
   use atlas_field_c_binding
   use atlas_Field_module, only: atlas_Field
   class(atlas_FieldSet), intent(inout) :: this
   character(*), intent(in) :: field_names(:)
   logical, intent(in), optional :: value
   type(atlas_Field) :: field
-  integer :: i, value_int
+  integer(c_int) :: i, value_int
   value_int = 1
   if (present(value)) then
     if (.not. value) then
@@ -416,12 +419,13 @@ end subroutine
 !-------------------------------------------------------------------------------
 
 subroutine set_device_needs_update_value(this, value)
+  use, intrinsic :: iso_c_binding, only : c_int
   use atlas_field_c_binding
   use atlas_Field_module, only: atlas_Field
   class(atlas_FieldSet), intent(inout) :: this
   logical, intent(in), optional :: value
   type(atlas_Field) :: field
-  integer :: i, value_int
+  integer(c_int) :: i, value_int
   value_int = 1
   if (present(value)) then
     if (.not. value) then
@@ -437,13 +441,14 @@ end subroutine
 !-------------------------------------------------------------------------------
 
 subroutine set_device_needs_update_idx(this, field_indices, value)
+  use, intrinsic :: iso_c_binding, only : c_int
   use atlas_field_c_binding
   use atlas_Field_module, only: atlas_Field
   class(atlas_FieldSet), intent(inout) :: this
   integer, intent(in) :: field_indices(:)
   logical, intent(in), optional :: value
   type(atlas_Field) :: field
-  integer :: i, value_int
+  integer(c_int) :: i, value_int
   value_int = 1
   if (present(value)) then
     if (.not. value) then
@@ -459,13 +464,14 @@ end subroutine
 !-------------------------------------------------------------------------------
 
 subroutine set_device_needs_update_name(this, field_names, value)
+  use, intrinsic :: iso_c_binding, only : c_int
   use atlas_field_c_binding
   use atlas_Field_module, only: atlas_Field
   class(atlas_FieldSet), intent(inout) :: this
   character(*), intent(in) :: field_names(:)
   logical, intent(in), optional :: value
   type(atlas_Field) :: field
-  integer :: i, value_int
+  integer(c_int) :: i, value_int
   value_int = 1
   if (present(value)) then
     if (.not. value) then
@@ -481,12 +487,13 @@ end subroutine
 !-------------------------------------------------------------------------------
 
 subroutine sync_host_device_idx(this, field_indices)
+  use, intrinsic :: iso_c_binding, only : c_int
   use atlas_field_c_binding
   use atlas_Field_module, only: atlas_Field
   class(atlas_FieldSet), intent(inout) :: this
   integer, intent(in), optional :: field_indices(:)
   type(atlas_Field) :: field
-  integer :: i
+  integer(c_int) :: i
   if (present(field_indices)) then
     do i = 1, size(field_indices)
       field = this%field(field_indices(i))
@@ -503,12 +510,13 @@ end subroutine
 !-------------------------------------------------------------------------------
 
 subroutine sync_host_device_name(this, field_names)
+  use, intrinsic :: iso_c_binding, only : c_int
   use atlas_field_c_binding
   use atlas_Field_module, only: atlas_Field
   class(atlas_FieldSet), intent(inout) :: this
   character(*), intent(in) :: field_names(:)
   type(atlas_Field) :: field
-  integer :: i
+  integer(c_int) :: i
   do i = 1, size(field_names)
     field = this%field(field_names(i))
     call atlas__Field__sync_host_device(field%CPTR_PGIBUG_A)
@@ -518,12 +526,13 @@ end subroutine
 !-------------------------------------------------------------------------------
 
 subroutine allocate_device_idx(this, field_indices)
+  use, intrinsic :: iso_c_binding, only : c_int
   use atlas_field_c_binding
   use atlas_Field_module, only: atlas_Field
   class(atlas_FieldSet), intent(inout) :: this
   integer, intent(in), optional :: field_indices(:)
   type(atlas_Field) :: field
-  integer :: i
+  integer(c_int) :: i
   if (present(field_indices)) then
     do i = 1, size(field_indices)
       field = this%field(field_indices(i))
@@ -540,12 +549,13 @@ end subroutine
 !-------------------------------------------------------------------------------
 
 subroutine allocate_device_name(this, field_names)
+  use, intrinsic :: iso_c_binding, only : c_int
   use atlas_field_c_binding
   use atlas_Field_module, only: atlas_Field
   class(atlas_FieldSet), intent(inout) :: this
   character(*), intent(in) :: field_names(:)
   type(atlas_Field) :: field
-  integer :: i
+  integer(c_int) :: i
   do i = 1, size(field_names)
     field = this%field(field_names(i))
     call atlas__Field__allocate_device(field%CPTR_PGIBUG_A)
@@ -555,12 +565,13 @@ end subroutine
 !-------------------------------------------------------------------------------
 
 subroutine update_device_idx(this, field_indices)
+  use, intrinsic :: iso_c_binding, only : c_int
   use atlas_field_c_binding
   use atlas_Field_module, only: atlas_Field
   class(atlas_FieldSet), intent(inout) :: this
   integer, intent(in), optional :: field_indices(:)
   type(atlas_Field) :: field
-  integer :: i
+  integer(c_int) :: i
   if (present(field_indices)) then
     do i = 1, size(field_indices)
       field = this%field(field_indices(i))
@@ -577,12 +588,13 @@ end subroutine
 !-------------------------------------------------------------------------------
 
 subroutine update_device_name(this, field_names)
+  use, intrinsic :: iso_c_binding, only : c_int
   use atlas_field_c_binding
   use atlas_Field_module, only: atlas_Field
   class(atlas_FieldSet), intent(inout) :: this
   character(*), intent(in) :: field_names(:)
   type(atlas_Field) :: field
-  integer :: i
+  integer(c_int) :: i
   do i = 1, size(field_names)
     field = this%field(field_names(i))
     call atlas__Field__update_device(field%CPTR_PGIBUG_A)
@@ -592,12 +604,13 @@ end subroutine
 !-------------------------------------------------------------------------------
 
 subroutine update_host_idx(this, field_indices)
+  use, intrinsic :: iso_c_binding, only : c_int
   use atlas_field_c_binding
   use atlas_Field_module, only: atlas_Field
   class(atlas_FieldSet), intent(inout) :: this
   integer, optional :: field_indices(:)
   type(atlas_Field) :: field
-  integer :: i
+  integer(c_int) :: i
   if (present(field_indices)) then
     do i = 1, size(field_indices)
       field = this%field(field_indices(i))
@@ -614,12 +627,13 @@ end subroutine
 !-------------------------------------------------------------------------------
 
 subroutine update_host_name(this, field_names)
+  use, intrinsic :: iso_c_binding, only : c_int
   use atlas_field_c_binding
   use atlas_Field_module, only: atlas_Field
   class(atlas_FieldSet), intent(inout) :: this
   character(*), intent(in) :: field_names(:)
   type(atlas_Field) :: field
-  integer :: i
+  integer(c_int) :: i
   do i = 1, size(field_names)
     field = this%field(field_names(i))
     call atlas__Field__update_host(field%CPTR_PGIBUG_A)
@@ -629,12 +643,13 @@ end subroutine
 !-------------------------------------------------------------------------------
 
 subroutine deallocate_device_idx(this, field_indices)
+  use, intrinsic :: iso_c_binding, only : c_int
   use atlas_field_c_binding
   use atlas_Field_module, only: atlas_Field
   class(atlas_FieldSet), intent(inout) :: this
   integer, optional :: field_indices(:)
   type(atlas_Field) :: field
-  integer :: i
+  integer(c_int) :: i
   if (present(field_indices)) then
     do i = 1, size(field_indices)
       field = this%field(field_indices(i))
@@ -651,12 +666,13 @@ end subroutine
 !-------------------------------------------------------------------------------
 
 subroutine deallocate_device_name(this, field_names)
+  use, intrinsic :: iso_c_binding, only : c_int
   use atlas_field_c_binding
   use atlas_Field_module, only: atlas_Field
   class(atlas_FieldSet), intent(inout) :: this
   character(*), intent(in) :: field_names(:)
   type(atlas_Field) :: field
-  integer :: i
+  integer(c_int) :: i
   do i = 1, size(field_names)
     field = this%field(field_names(i))
     call atlas__Field__deallocate_device(field%CPTR_PGIBUG_A)
