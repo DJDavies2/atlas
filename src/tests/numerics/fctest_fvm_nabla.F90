@@ -217,6 +217,7 @@ SCALE = DEG2RAD*DEG2RAD*RA
 
 !     ------------------------------------------------------------------
 
+#ifndef NAGFOR
 !IF (LHOOK) CALL DR_HOOK('FV_GRADIENT',0,ZHOOK_HANDLE)
 
 ASSOCIATE(NFLEVG=>nlev)
@@ -281,6 +282,7 @@ ENDDO
 END ASSOCIATE
 
 !IF (LHOOK) CALL DR_HOOK('FV_GRADIENT',1,ZHOOK_HANDLE)
+#endif
 END SUBROUTINE FV_GRADIENT
 
 
@@ -295,6 +297,7 @@ TESTSUITE_WITH_FIXTURE(fctest_atlas_nabla_EdgeBasedFiniteVolume,fctest_atlas_nab
 ! -----------------------------------------------------------------------------
 
 TESTSUITE_INIT
+#ifndef NAGFOR
   call atlas_library%initialise()
 
   RA = 10.
@@ -323,11 +326,13 @@ TESTSUITE_INIT
   call rotated_flow_magnitude(fvm,varfield,beta=0.5*RPI*0.75,radius=RA)
 
 
+#endif
 END_TESTSUITE_INIT
 
 ! -----------------------------------------------------------------------------
 
 TESTSUITE_FINALIZE
+#ifndef NAGFOR
   ! Cleanup
   call config%final()
   call varfield%final()
@@ -340,11 +345,13 @@ TESTSUITE_FINALIZE
   call grid%final()
   call meshgenerator%final()
   call atlas_library%finalise()
+#endif
 END_TESTSUITE_FINALIZE
 
 ! -----------------------------------------------------------------------------
 
 TEST( test_fvm )
+#ifndef NAGFOR
 type(atlas_StructuredGrid) :: grid
 type(atlas_MeshGenerator) :: meshgenerator
 type(atlas_Mesh) :: mesh
@@ -359,11 +366,13 @@ call fvm%final()
 call mesh%final()
 call grid%final()
 
+#endif
 END_TEST
 
 ! -----------------------------------------------------------------------------
 
 TEST( test_nabla )
+#ifndef NAGFOR
 type(timer_type) :: timer;
 integer :: jiter, niter
 real(c_double), allocatable :: norm_native(:)
@@ -411,6 +420,7 @@ gmsh = atlas_output_Gmsh("out_atlas_fctest_fvm_nabla.msh", levels=[10])
 call gmsh%write( mesh )
 call gmsh%write( varfield )
 call gmsh%write( gradfield )
+#endif
 END_TEST
 
 ! -----------------------------------------------------------------------------
