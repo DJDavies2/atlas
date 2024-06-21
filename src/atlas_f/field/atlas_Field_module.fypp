@@ -410,7 +410,7 @@ function atlas_Field__wrap_name_${dtype}$_r${rank}$(name,data) result(field)
   use fckit_c_interop_module, only : c_str
   type(atlas_Field) :: field
   character(len=*), intent(in) :: name
-  ${ftype}$, intent(in) :: data(${dim[rank]}$)
+  ${ftype}$, intent(in), target :: data(${dim[rank]}$)
   integer(c_int) :: shapef(${rank}$)
   integer(c_int) :: stridesf(${rank}$)
 #:if ftype != "logical"
@@ -432,7 +432,7 @@ function atlas_Field__wrap_${dtype}$_r${rank}$(data) result(field)
   use fckit_c_interop_module, only : c_str
   use fckit_array_module, only : array_strides, array_view1d
   type(atlas_Field) :: field
-  ${ftype}$, intent(in) :: data(${dim[rank]}$)
+  ${ftype}$, intent(in), target :: data(${dim[rank]}$)
   integer(c_int) :: shapef(${rank}$)
   integer(c_int) :: stridesf(${rank}$)
 #:if ftype != "logical"
