@@ -1,4 +1,11 @@
-add_library( atlas_field_api_objects OBJECT field_ranksuff_module.fypp field_factory_module.fypp field_abort_module.F90 field_helper_module.F90 field_async_module.F90)
+add_library( atlas_field_api_objects OBJECT
+  field_ranksuff_module.fypp
+  field_factory_module.fypp
+  field_abort_module.F90
+  field_helper_module.F90
+  field_async_module.F90
+  field_defaults_module.F90
+)
 set_target_properties( atlas_field_api_objects PROPERTIES Fortran_MODULE_DIRECTORY ${CMAKE_BINARY_DIR}/module/atlas_field_api )
 target_include_directories( atlas_field_api_objects PUBLIC $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/module/atlas_field_api>)
 

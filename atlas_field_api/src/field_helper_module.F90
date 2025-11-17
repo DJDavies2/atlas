@@ -53,16 +53,6 @@ function field_my_thread()
 #endif
 end function
 
-function field_pooled_default()
-    logical :: field_pooled_default
-    field_pooled_default = .false.
-end function
-
-function field_pinned_default()
-    logical :: field_pinned_default
-    field_pinned_default = .false.
-end function
-
 function optional_arg(VALUE, DEFAULT)
     logical :: optional_arg
     logical, intent(in), optional :: VALUE
@@ -87,12 +77,13 @@ end subroutine
 subroutine set_host_resource(PINNED, POOLED)
     ! Method to select which host resource to use, based on values of PINNED and POOLED
     use pluto_module
+    use field_defaults_module, only : INIT_PINNED_VALUE, POOL_OWNED_FIELDS
     logical, intent(in), optional :: PINNED
     logical, intent(in), optional :: POOLED
     logical :: pooled_
     logical :: pinned_
-    pooled_ = optional_arg(POOLED, DEFAULT=field_pooled_default())
-    pinned_ = optional_arg(PINNED, DEfAULT=field_pinned_default())
+    pooled_ = optional_arg(POOLED, DEFAULT=POOL_OWNED_FIELDS)
+    pinned_ = optional_arg(PINNED, DEfAULT=INIT_PINNED_VALUE)
     if (pooled_ .and. pinned_) then
         call pluto%host%set_default_resource(pluto%pinned_pool_resource())
     else if (pooled_ .and. .not. pinned_) then
