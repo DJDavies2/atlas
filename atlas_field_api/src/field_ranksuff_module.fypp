@@ -160,7 +160,7 @@ end subroutine
 
 #:if rank > 1
 function get_view_${rank}$${dtype}$(self, BLOCK_INDEX, ZERO) result(view)
-    use field_util_module, only : field_my_thread
+    use field_helper_module, only : field_my_thread
     class(FIELD_${rank}$${dtype}$), intent(inout) :: self
     integer, intent(in) :: BLOCK_INDEX
     logical, optional, intent(in) :: ZERO

@@ -42,7 +42,7 @@ subroutine FIELD_NEW_${rank}$${dtype}$(FIELD_PTR, UBOUNDS, LBOUNDS, PERSISTENT, 
     use pluto_module
     use atlas_module, only : atlas_Field, atlas_real
     use field_ranksuff_module, only : FIELD_${rank}$${dtype}$
-    use field_util_module, only : set_host_resource, optional_arg, field_threads
+    use field_helper_module, only : set_host_resource, optional_arg, field_threads
     implicit none
     class(FIELD_${rank}$${dtype}$), pointer, intent(inout) :: FIELD_PTR
     integer,   intent(in)           :: UBOUNDS(:)
@@ -88,7 +88,7 @@ subroutine FIELD_NEW_WRAP_${rank}$${dtype}$(FIELD_PTR, LBOUNDS, PERSISTENT, DATA
     use pluto_module, only : pluto
     use atlas_module, only : atlas_field
     use field_ranksuff_module, only : FIELD_${rank}$${dtype}$
-    use field_util_module, only : optional_arg, set_device_mapped_host_resource
+    use field_helper_module, only : optional_arg, set_device_mapped_host_resource
     implicit none
     class(FIELD_${rank}$${dtype}$), pointer, intent(inout) :: FIELD_PTR
     integer,   intent(in), optional :: LBOUNDS(:)

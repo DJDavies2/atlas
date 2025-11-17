@@ -6,7 +6,7 @@
 ! granted to it by virtue of its status as an intergovernmental organisation
 ! nor does it submit to any jurisdiction.
 
-module field_util_module
+module field_helper_module
 
 ! WARNING: This module is not part of the public API!
 
