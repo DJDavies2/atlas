@@ -34,6 +34,13 @@ CONTAINS
    procedure :: get_device_data_rdwr   => get_device_data_rdwr_${rank}$${dtype}$
    procedure :: get_device_data_rdonly => get_device_data_rdonly_${rank}$${dtype}$
    procedure :: get_device_data_wronly => get_device_data_wronly_${rank}$${dtype}$
+
+   procedure :: sync_host_rdwr => sync_host_rdwr_${rank}$${dtype}$
+   procedure :: sync_host_rdonly => sync_host_rdonly_${rank}$${dtype}$
+   procedure :: sync_device_rdwr => sync_device_rdwr_${rank}$${dtype}$
+   procedure :: sync_device_rdonly => sync_device_rdonly_${rank}$${dtype}$
+   procedure :: sync_device_wronly => sync_device_wronly_${rank}$${dtype}$
+
 #:if rank > 1
    procedure :: get_view => get_view_${rank}$${dtype}$
 #:endif
@@ -45,31 +52,58 @@ contains
 
 #:for dtype, ftype in zip(dtypes, ftypes)
 #:for rank in ranks
-subroutine get_host_data_rdwr_${rank}$${dtype}$(self, ptr)
+subroutine sync_host_rdwr_${rank}$${dtype}$(self, queue)
+    use, intrinsic :: iso_fortran_env, only : int32
     class(FIELD_${rank}$${dtype}$), intent(inout) :: self
-    ${ftype}$, pointer, intent(inout) :: ptr(${dim[rank]}$)
-    ${ftype}$, pointer :: f_data(${dim[rank]}$)
+    integer(int32), optional, intent(in) :: queue
     call self%f%sync_host()
     call self%f%set_device_needs_update(.true.) ! Because we will write to host
+end subroutine
+
+subroutine get_host_data_rdwr_${rank}$${dtype}$(self, ptr, queue)
+    use, intrinsic :: iso_fortran_env, only : int32
+    class(FIELD_${rank}$${dtype}$), intent(inout) :: self
+    ${ftype}$, pointer, intent(inout) :: ptr(${dim[rank]}$)
+    integer(int32), optional, intent(in) :: queue
+    ${ftype}$, pointer :: f_data(${dim[rank]}$)
+    call sync_host_rdwr_${rank}$${dtype}$(self,queue)
     call self%f%data(f_data)
     ptr(${range[rank]}$) => f_data
 end subroutine
 
-subroutine get_host_data_rdonly_${rank}$${dtype}$(self, ptr)
+subroutine sync_host_rdonly_${rank}$${dtype}$(self, queue)
+    use, intrinsic :: iso_fortran_env, only : int32
     class(FIELD_${rank}$${dtype}$), intent(inout) :: self
-    ${ftype}$, pointer, intent(inout) :: ptr(${dim[rank]}$)
-    ${ftype}$, pointer :: f_data(${dim[rank]}$)
+    integer(int32), optional, intent(in) :: queue
     call self%f%sync_host()
+end subroutine
+
+subroutine get_host_data_rdonly_${rank}$${dtype}$(self, ptr, queue)
+    use, intrinsic :: iso_fortran_env, only : int32
+    class(FIELD_${rank}$${dtype}$), intent(inout) :: self
+    ${ftype}$, pointer, intent(inout) :: ptr(${dim[rank]}$)
+    integer(int32), optional, intent(in) :: queue
+    ${ftype}$, pointer :: f_data(${dim[rank]}$)
+    call sync_host_rdonly_${rank}$${dtype}$(self, queue)
     call self%f%data(f_data)
     ptr(${range[rank]}$) => f_data
 end subroutine
 
-subroutine get_device_data_rdwr_${rank}$${dtype}$(self, ptr)
+subroutine sync_device_rdwr_${rank}$${dtype}$(self, queue)
+    use, intrinsic :: iso_fortran_env, only : int32
     class(FIELD_${rank}$${dtype}$), intent(inout) :: self
-    ${ftype}$, pointer, intent(inout) :: ptr(${dim[rank]}$)
-    ${ftype}$, pointer :: f_data(${dim[rank]}$)
+    integer(int32), optional, intent(in) :: queue
     call self%f%sync_device()
     call self%f%set_host_needs_update(.true.) ! Because we will write to device
+end subroutine
+
+subroutine get_device_data_rdwr_${rank}$${dtype}$(self, ptr, queue)
+    use, intrinsic :: iso_fortran_env, only : int32
+    class(FIELD_${rank}$${dtype}$), intent(inout) :: self
+    ${ftype}$, pointer, intent(inout) :: ptr(${dim[rank]}$)
+    integer(int32), optional, intent(in) :: queue
+    ${ftype}$, pointer :: f_data(${dim[rank]}$)
+    call sync_device_rdwr_${rank}$${dtype}$(self, queue)
     if (self%map_devptr) then
         call self%f%device_mapped_host_data(f_data)
     else
@@ -78,11 +112,20 @@ subroutine get_device_data_rdwr_${rank}$${dtype}$(self, ptr)
     ptr(${range[rank]}$) => f_data
 end subroutine
 
-subroutine get_device_data_rdonly_${rank}$${dtype}$(self, ptr)
+subroutine sync_device_rdonly_${rank}$${dtype}$(self, queue)
+    use, intrinsic :: iso_fortran_env, only : int32
     class(FIELD_${rank}$${dtype}$), intent(inout) :: self
-    ${ftype}$, pointer, intent(inout) :: ptr(${dim[rank]}$)
-    ${ftype}$, pointer :: f_data(${dim[rank]}$)
+    integer(int32), optional, intent(in) :: queue
     call self%f%sync_device()
+end subroutine
+
+subroutine get_device_data_rdonly_${rank}$${dtype}$(self, ptr, queue)
+    use, intrinsic :: iso_fortran_env, only : int32
+    class(FIELD_${rank}$${dtype}$), intent(inout) :: self
+    ${ftype}$, pointer, intent(inout) :: ptr(${dim[rank]}$)
+    integer(int32), optional, intent(in) :: queue
+    ${ftype}$, pointer :: f_data(${dim[rank]}$)
+    call sync_device_rdonly_${rank}$${dtype}$(self, queue)
     if (self%map_devptr) then
         call self%f%device_mapped_host_data(f_data)
     else
@@ -91,13 +134,22 @@ subroutine get_device_data_rdonly_${rank}$${dtype}$(self, ptr)
     ptr(${range[rank]}$) => f_data
 end subroutine
 
-subroutine get_device_data_wronly_${rank}$${dtype}$(self, ptr)
+subroutine sync_device_wronly_${rank}$${dtype}$(self, queue)
+    use, intrinsic :: iso_fortran_env, only : int32
     class(FIELD_${rank}$${dtype}$), intent(inout) :: self
-    ${ftype}$, pointer, intent(inout) :: ptr(${dim[rank]}$)
-    ${ftype}$, pointer :: f_data(${dim[rank]}$)
+    integer(int32), optional, intent(in) :: queue
     call self%f%allocate_device()
     call self%f%set_device_needs_update(.false.)
     call self%f%set_host_needs_update(.true.) ! Because we will write to device
+end subroutine
+
+subroutine get_device_data_wronly_${rank}$${dtype}$(self, ptr, queue)
+    use, intrinsic :: iso_fortran_env, only : int32
+    class(FIELD_${rank}$${dtype}$), intent(inout) :: self
+    ${ftype}$, pointer, intent(inout) :: ptr(${dim[rank]}$)
+    integer(int32), optional, intent(in) :: queue
+    ${ftype}$, pointer :: f_data(${dim[rank]}$)
+    call sync_device_wronly_${rank}$${dtype}$(self, queue)
     if (self%map_devptr) then
         call self%f%device_mapped_host_data(f_data)
     else
@@ -107,10 +159,11 @@ subroutine get_device_data_wronly_${rank}$${dtype}$(self, ptr)
 end subroutine
 
 #:if rank > 1
-function get_view_${rank}$${dtype}$(self, BLOCK_INDEX) result(view)
+function get_view_${rank}$${dtype}$(self, BLOCK_INDEX, ZERO) result(view)
     use field_util_module, only : field_my_thread
     class(FIELD_${rank}$${dtype}$), intent(inout) :: self
     integer, intent(in) :: BLOCK_INDEX
+    logical, optional, intent(in) :: ZERO
     ${ftype}$, pointer :: f_data(${dim[rank]}$)
     ${ftype}$, pointer :: view(${dim[rank-1]}$)
     integer :: JBLK
