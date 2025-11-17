@@ -1,0 +1,15 @@
+
+include( CMakeFindDependencyMacro )
+
+set( atlas_field_api_HAVE_OMP                          @HAVE_OMP@ )
+set( atlas_field_api_HAVE_ACC                          @HAVE_ACC@ )
+
+find_dependency( atlas HINTS ${CMAKE_CURRENT_LIST_DIR}/../atlas @atlas_DIR@ @atlas_BINARY_DIR@ )
+
+if (atlas_field_api_HAVE_OMP)
+  find_dependency( OpenMP COMPONENTS Fortran )
+endif()
+
+if (atlas_field_api_HAVE_ACC)
+  find_dependency( OpenACC COMPONENTS Fortran )
+endif()
