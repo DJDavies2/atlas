@@ -35,4 +35,6 @@ ecbuild_add_executable(
   LIBS        atlas
   CONDITION   atlas_HAVE_ATLAS_GRID )
 
-add_subdirectory(atlas-interpolations)
+if( atlas_HAVE_ATLAS_INTERPOLATION )
+  add_subdirectory(atlas-interpolations)
+endif()
