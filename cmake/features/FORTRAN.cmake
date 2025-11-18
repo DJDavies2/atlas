@@ -2,10 +2,15 @@
 
 ecbuild_add_option( FEATURE FORTRAN
                     DESCRIPTION "Provide Fortran bindings"
-                    REQUIRED_PACKAGES "fckit VERSION 0.6.2 COMPONENTS ECKIT"
-                    CONDITION atlas_HAVE_ATLAS_FUNCTIONSPACE )
+                    REQUIRED_PACKAGES "fckit VERSION 0.6.2 COMPONENTS ECKIT" )
 
 if( atlas_HAVE_FORTRAN )
+
+  if( NOT atlas_HAVE_ATLAS_FUNCTIONSPACE )
+    ecbuild_warn( "In order to compile atlas_f, atlas is required to be compiled with feature ATLAS_FUNCTIONSPACE ON. Turning off fortran." )
+    set( HAVE_FORTRAN 0 )
+    set( atlas_HAVE_FORTRAN 0 )
+  endif()
 
   if( fckit_HAVE_ECKIT )
 
