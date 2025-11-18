@@ -13,9 +13,9 @@ public :: FIELD_NEW, FIELD_DELETE
 
 #:set ranks  = [1,2,3,4]
 #:set dim    = ['',':',':,:',':,:,:',':,:,:,:',':,:,:,:,:']
-#:set dtypes = ['RM','RD']
-#:set ftypes = ['real(4)','real(8)']
-#:set atlas_kinds = ['atlas_real(4)','atlas_real(8)']
+#:set dtypes = ['RM','RD','IM']
+#:set ftypes = ['real(4)','real(8)','integer(4)']
+#:set atlas_kinds = ['atlas_real(4)','atlas_real(8)','atlas_integer(4)']
 
 interface FIELD_NEW
 #:for dtype in dtypes
@@ -40,7 +40,7 @@ contains
 #:for rank in ranks
 subroutine FIELD_NEW_${rank}$${dtype}$(FIELD_PTR, UBOUNDS, LBOUNDS, PERSISTENT, DELAYED, INIT_VALUE, PINNED, MAP_DEVPTR, POOLED)
     use pluto_module
-    use atlas_module, only : atlas_Field, atlas_real
+    use atlas_module, only : atlas_Field, atlas_real, atlas_integer
     use field_ranksuff_module, only : FIELD_${rank}$${dtype}$
     use field_helper_module, only : set_host_resource, optional_arg, field_threads
     use field_defaults_module, only : INIT_MAP_DEVPTR

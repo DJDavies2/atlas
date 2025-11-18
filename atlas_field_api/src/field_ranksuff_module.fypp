@@ -13,12 +13,13 @@ private
 
 public :: FIELD_1RM, FIELD_2RM, FIELD_3RM, FIELD_4RM
 public :: FIELD_1RD, FIELD_2RD, FIELD_3RD, FIELD_4RD
+public :: FIELD_1IM, FIELD_2IM, FIELD_3IM, FIELD_4IM
 
 #:set ranks  = [1,2,3,4]
 #:set dim    = ['',':',':,:',':,:,:',':,:,:,:',':,:,:,:,:']
 #:set range  = ['','self%lbounds(1):', 'self%lbounds(1):,self%lbounds(2):', 'self%lbounds(1):,self%lbounds(2):,self%lbounds(3):', 'self%lbounds(1):,self%lbounds(2):,self%lbounds(3):,self%lbounds(4):']
-#:set dtypes = ['RM','RD']
-#:set ftypes = ['real(4)','real(8)']
+#:set dtypes = ['RM','RD','IM']
+#:set ftypes = ['real(4)','real(8)','integer(4)']
 
 #:for dtype in dtypes
 #:for rank in ranks
