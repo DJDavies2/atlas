@@ -23,6 +23,7 @@ with_gridtools=false
 with_ectrans=false
 with_fftw=false
 with_qhull=false
+with_lz4=false
 with_deps=false
 with_atlas_orca=false
 with_atlas_fesom=false
@@ -94,6 +95,9 @@ while [ $# != 0 ]; do
     "--enable-qhull")
         with_qhull=true;
         ;;
+    "--enable-lz4")
+        with_lz4=true;
+        ;;
     "--with-atlas-orca")
         with_atlas_orca=true;
         ;;
@@ -147,6 +151,11 @@ if ${with_deps}; then
   ### Install qhull (optional, off by default)
   if ${with_qhull}; then
     install-qhull.sh --prefix ${PREFIX}
+  fi
+
+  ### Install lz4 (optional, off by default)
+  if ${with_lz4}; then
+    install-lz4.sh --prefix ${PREFIX}
   fi
 
   ### Install ecbuild
