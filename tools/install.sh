@@ -268,6 +268,10 @@ if ${with_atlas_orca}; then
 fi
 
 if ${with_atlas_fesom}; then
+  if ${with_deps}; then
+    echo "atlas-fesom plugin requires METIS. Installing METIS as dependency."
+    install-metis.sh --prefix ${PREFIX}
+  fi
   echo "Installing atlas-fesom"
   [[ -d ${SOURCES_DIR}/atlas-fesom ]] || git clone -b ${ATLAS_FESOM_VERSION:-main} ${ATLAS_FESOM_GIT:-"https://github.com/ecmwf/atlas-fesom"} ${SOURCES_DIR}/atlas-fesom
   cmake -S ${SOURCES_DIR}/atlas-fesom -B ${BUILDS_DIR}/atlas-fesom -DCMAKE_INSTALL_PREFIX=${PREFIX} \
