@@ -107,6 +107,7 @@ fi
 echo "+ cd ${metis_dir}"
 cd ${metis_dir}
 echo "Applying patch to link metis to GKlib"
+sed -i -e 's/link_directories(${GKLIB_PATH}\/lib)/link_directories(${GKLIB_PATH}\/lib)\nlink_directories(${GKLIB_PATH}\/lib64)/g' CMakeLists.txt
 sed -i -e 's/add_library(metis ${METIS_LIBRARY_TYPE} ${metis_sources})/add_library(metis ${METIS_LIBRARY_TYPE} ${metis_sources})\ntarget_link_libraries(metis PUBLIC GKlib)/g' libmetis/CMakeLists.txt
 make config shared=1 prefix=${PREFIX} gklib_path=${PREFIX}
 echo "+ make -j8"
