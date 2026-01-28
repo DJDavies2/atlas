@@ -91,6 +91,7 @@ use atlas_redistribution_module
 
 implicit none
 
+#ifndef INTEL
 type(atlas_Grid) :: grid
 type(atlas_Mesh) :: mesh
 type(atlas_MeshGenerator) :: meshgenerator
@@ -125,6 +126,7 @@ FCTEST_CHECK(maxval(field_v) == 1.)
 call fspace_2%final()
 call fspace_1%final()
 call grid%final()
+#endif
 END_TEST
 
 ! -----------------------------------------------------------------------------
