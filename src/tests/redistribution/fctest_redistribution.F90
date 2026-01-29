@@ -91,7 +91,7 @@ use atlas_redistribution_module
 
 implicit none
 
-#ifndef INTEL
+#ifndef INTEL_19_BUG
 type(atlas_Grid) :: grid
 type(atlas_Mesh) :: mesh
 type(atlas_MeshGenerator) :: meshgenerator

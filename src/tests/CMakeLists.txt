@@ -34,6 +34,9 @@ if( CMAKE_Fortran_COMPILER_ID MATCHES "Intel" )
       endif()
 
   ecbuild_remove_fortran_flags( "-g" )
+    if( CMAKE_Fortran_COMPILER_VERSION VERSION_LESS 19.1 )
+          set( CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -DINTEL_19_BUG" )
+    endif()
 endif()
 
 ######################################################
