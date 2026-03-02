@@ -53,7 +53,7 @@ ecbuild_add_option( FEATURE WARNING_AS_ERROR
                     DESCRIPTION "Treat compile warning as error" )
 
 if(HAVE_WARNING_AS_ERROR)
-  ecbuild_add_cxx_flags("-Werror" NO_FAIL NAME pluto_cxx_warning_as_error QUIET)
+  ecbuild_add_cxx_flags("-Werror" NO_FAIL NAME hic_cxx_warning_as_error QUIET)
 endif()
 
 if( CMAKE_CXX_COMPILER_ID STREQUAL Intel )
