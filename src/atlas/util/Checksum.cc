@@ -32,10 +32,10 @@ size_t byte_size(size_t size) {
     return size * sizeof(Value) / sizeof(char);
 }
 
-typedef union {
+union Fletcher16 {
   checksum_t checksum;
   uint16_t c[2];
-} Fletcher16;
+};
 
 static void fletcher16_reset(Fletcher16& f) {
   f.c[0] = 0;

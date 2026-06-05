@@ -93,6 +93,19 @@ ecbuild_add_test( TARGET atlas_test_blockstructuredcolumns
   CONDITION eckit_HAVE_MPI AND MPI_SLOTS GREATER_EQUAL 3
 )
 
+ecbuild_add_test( TARGET atlas_test_blockstructuredcolumns_checksum
+  SOURCES  test_blockstructuredcolumns_checksum.cc
+  LIBS     atlas
+  ENVIRONMENT ${ATLAS_TEST_ENVIRONMENT}
+)
+
+ecbuild_add_test( TARGET atlas_test_blockstructuredcolumns_checksum_mpi
+  COMMAND   atlas_test_blockstructuredcolumns_checksum
+  MPI       4
+  ENVIRONMENT ${ATLAS_TEST_ENVIRONMENT}
+  CONDITION eckit_HAVE_MPI AND MPI_SLOTS GREATER_EQUAL 4
+)
+
 ecbuild_add_test( TARGET atlas_test_pointcloud
   SOURCES  test_pointcloud.cc
   LIBS     atlas
