@@ -19,7 +19,7 @@ on:
 env:
   ATLAS_TOOLS: ${{ github.workspace }}/tools
   CTEST_PARALLEL_LEVEL: 1
-  CACHE_SUFFIX: v2
+  CACHE_SUFFIX: v3
 
 jobs:
   ci:
@@ -235,11 +235,9 @@ jobs:
       shell: bash -eux {0}
       run: |
         FCFLAGS=-fPIC CFLAGS=-fPIC FFLAGS=-fPIC ${ATLAS_TOOLS}/install-mpi.sh --mpi openmpi --prefix  ${DEPS_DIR}/openmpi
-        if [[ "${{ matrix.os }}" =~ macos ]]; then
-           echo "CACHE_SUFFIX=${CACHE_SUFFIX}-mpi_$(mpirun --version | head -1 | awk '{print $4}')" >> $GITHUB_ENV
-        fi
         [ -f ${DEPS_DIR}/openmpi/env.sh ] && source ${DEPS_DIR}/openmpi/env.sh
         [ -z ${MPI_HOME+x} ] || echo "MPI_HOME=${MPI_HOME}" >> $GITHUB_ENV
+        echo "CACHE_SUFFIX=${CACHE_SUFFIX}-mpi_$(${MPI_HOME}/bin/mpirun --version | head -1 | awk '{print $4}')" >> $GITHUB_ENV
 
     - name: Install FFTW
       shell: bash -eux {0}

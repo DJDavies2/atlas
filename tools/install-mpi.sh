@@ -35,7 +35,7 @@ while [ $# != 0 ]; do
 done
 
 os=$(uname)
-OMPIVER=4.1.1
+OMPIVER=5.0.10
 MPICHVER=3.4.2
 
 if [ ! -z ${mpi_version+x} ]; then
@@ -49,20 +49,41 @@ fi
 
 
 mkdir -p ${PREFIX}
-touch ${PREFIX}/env.sh
 
 MPI_INSTALLED=false
+MPI_ROOT=
+
+export_env() {
+  if [ -z "${MPI_HOME+x}" ]; then
+    export MPI_HOME=${MPI_ROOT}
+  fi
+
+  case ":${PATH}:" in
+    *":${MPI_HOME}/bin:"*) ;;
+    *) export PATH=${MPI_HOME}/bin:${PATH} ;;
+  esac
+}
+
+write_env() {
+cat > ${PREFIX}/env.sh << EOF
+export MPI_HOME=${MPI_ROOT}
+export PATH=\${MPI_HOME}/bin:\${PATH}
+EOF
+}
 
 case "$os" in
     Darwin)
         case "$MPI" in
             mpich)
                 brew ls --versions mpich || brew install mpich
+                MPI_ROOT=$(brew --prefix mpich)
                 ;;
             openmpi)
-                brew ls --versions open-mpi || brew install open-mpi
+                brew ls --versions openmpi || brew install openmpi
+                MPI_ROOT=$(brew --prefix openmpi)
                 echo "localhost slots=72" >> $(brew --prefix)/etc/openmpi-default-hostfile
                 echo "localhost slots=72" >> $(brew --prefix)/etc/prte-default-hostfile
+                echo "rmaps_default_mapping_policy=:oversubscribe" >> $(brew --prefix)/etc/prte-mca-params.conf
 
                 # workaround for open-mpi/omp#7516
                 echo "setting the mca gds to hash..."
@@ -85,11 +106,7 @@ case "$os" in
           echo "Not taking any action."
           exit 0
         fi
-        if [ -n "${I_MPI_ROOT}" ]; then
-          echo "MPI is already installed at I_MPI_ROOT=${I_MPI_ROOT}."
-          echo "Not taking any action."
-          exit 0
-        fi
+        MPI_ROOT=${PREFIX}
         case "$MPI" in
             mpich)
                 if [ -f ${PREFIX}/include/mpi.h ]; then
@@ -130,7 +147,8 @@ case "$os" in
                   echo "libmpi.so found -- nothing to build."
                 else
                   echo "Downloading openmpi source..."
-                  wget --no-check-certificate https://www.open-mpi.org/software/ompi/v4.1/downloads/openmpi-$OMPIVER.tar.gz
+                  OMPI_MAJOR_MINOR=$(echo $OMPIVER | sed 's/\([0-9]*\.[0-9]*\).*/\1/')
+                  wget --no-check-certificate https://www.open-mpi.org/software/ompi/v${OMPI_MAJOR_MINOR}/downloads/openmpi-$OMPIVER.tar.gz
                   tar -zxf openmpi-$OMPIVER.tar.gz
                   rm openmpi-$OMPIVER.tar.gz
                   echo "Configuring and building openmpi..."
@@ -140,6 +158,7 @@ case "$os" in
                   ${SCRIPTDIR}/reduce-output.sh make install
                   MPI_INSTALLED=true
                   echo "localhost slots=72" >> ${PREFIX}/etc/openmpi-default-hostfile
+                  echo "rmaps_default_mapping_policy=:oversubscribe" >> ${PREFIX}/etc/prte-mca-params.conf
                   cd -
                   rm -rf openmpi-$OMPIVER
                 fi
@@ -158,11 +177,9 @@ case "$os" in
 esac
 
 
-if ${MPI_INSTALLED} ; then
-cat > ${PREFIX}/env.sh << EOF
-export MPI_HOME=${PREFIX}
-export PATH=\${MPI_HOME}/bin:\${PATH}
-EOF
-echo "Please source ${PREFIX}/env.sh, containing:"
-cat ${PREFIX}/env.sh
+if [ -n "${MPI_ROOT}" ]; then
+  write_env
+  echo "Please source ${PREFIX}/env.sh, containing:"
+  cat ${PREFIX}/env.sh
+  export_env
 fi
