@@ -36,8 +36,8 @@ jobs:
           - linux gnu-14
           - linux clang-13
           - linux clang-18
-          - linux intel
-          - linux intel-classic
+          - linux intel-2025.3
+          - linux intel-classic-2021.10
           - linux nvhpc-26.1
           - macos
 
@@ -88,18 +88,18 @@ jobs:
             caching: true
             coverage: false
 
-          - name : linux intel
+          - name: linux intel-2025.3
             os: ubuntu-24.04
-            compiler: intel
+            compiler: intel-2025.3
             compiler_cc: icx
             compiler_cxx: icpx
             compiler_fc: ifx
             caching: true
             coverage: false
 
-          - name : linux intel-classic
+          - name: linux intel-classic-2021.10
             os: ubuntu-22.04
-            compiler: intel-classic
+            compiler: intel-classic-2021.10
             compiler_cc: icc
             compiler_cxx: icpc
             compiler_fc: ifort
@@ -226,9 +226,30 @@ jobs:
     - name: Install Intel oneAPI compiler
       if: contains( matrix.compiler, 'intel' )
       run: |
-        ${ATLAS_TOOLS}/install-intel-oneapi.sh
-        source /opt/intel/oneapi/setvars.sh
+        wget https://apt.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB
+        sudo apt-key add GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB
+        rm GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB
+        sudo add-apt-repository "deb https://apt.repos.intel.com/oneapi all main"
+        sudo apt-get update
+        if [[ "${{matrix.compiler}}" == "intel-classic-2021.10" ]]; then
+          version=2023.2.0 # latest oneapi version containing classic compiler (2021.10)
+          sudo apt-get install \
+            intel-oneapi-compiler-fortran-$version \
+            intel-oneapi-compiler-dpcpp-cpp-and-cpp-classic-$version \
+            intel-oneapi-mkl-$version
+          source /opt/intel/oneapi/setvars.sh
+          unset I_MPI_ROOT # We don't want to use the MPI from this compiler. It shows problems
+        else
+          #sudo apt-get install intel-oneapi-toolkit # since 2026 but MKL is too new for eckit 2.0.6
+          version=2025.3
+          sudo apt-get install \
+            intel-oneapi-base-toolkit-$version \
+            intel-oneapi-hpc-toolkit-$version \
+            intel-oneapi-compiler-fortran-$version
+          source /opt/intel/oneapi/setvars.sh
+        fi
         printenv >> $GITHUB_ENV
+        [ -z ${I_MPI_ROOT+x} ] || echo "MPI_HOME=${I_MPI_ROOT}" >> $GITHUB_ENV
         echo "CACHE_SUFFIX=$CC-$($CC -dumpversion)" >> $GITHUB_ENV
 
     - name: Install MPI
@@ -237,9 +258,11 @@ jobs:
         FCFLAGS=-fPIC CFLAGS=-fPIC FFLAGS=-fPIC ${ATLAS_TOOLS}/install-mpi.sh --mpi openmpi --prefix  ${DEPS_DIR}/openmpi
         [ -f ${DEPS_DIR}/openmpi/env.sh ] && source ${DEPS_DIR}/openmpi/env.sh
         [ -z ${MPI_HOME+x} ] || echo "MPI_HOME=${MPI_HOME}" >> $GITHUB_ENV
-        echo "CACHE_SUFFIX=${CACHE_SUFFIX}-mpi_$(${MPI_HOME}/bin/mpirun --version | head -1 | awk '{print $4}')" >> $GITHUB_ENV
+        echo "CACHE_SUFFIX=${CACHE_SUFFIX}-mpi_$(mpirun --version | head -1 | awk '{print $4}')" >> $GITHUB_ENV
 
     - name: Install FFTW
+      if: "!contains( matrix.compiler, 'intel' )"
+      # Use Intel MKL FFT functions instead of FFTW for intel compilers
       shell: bash -eux {0}
       run: |
         ${ATLAS_TOOLS}/install-fftw.sh --version 3.3.10 --prefix ${DEPS_DIR}/fftw
