@@ -140,7 +140,7 @@ jobs:
         fi
 
     - name: Checkout Repository
-      uses: actions/checkout@v2
+      uses: actions/checkout@v6
 
     - name: Set up Homebrew
       id: set-up-homebrew
@@ -195,7 +195,7 @@ jobs:
     - name: Retrieve cached dependencies
       if: matrix.caching
       id: deps-restore-cache
-      uses: actions/cache/restore@v4
+      uses: actions/cache/restore@v5
       with:
         path: ${{ env.DEPS_DIR }}
         key: deps-${{ matrix.os }}-${{ matrix.compiler }}-${{ env.CACHE_SUFFIX }}
@@ -291,7 +291,7 @@ jobs:
       # There seems to be a problem with cached NVHPC dependencies, leading to SIGILL perhaps due to slightly different architectures
       if: matrix.caching && matrix.build_type == 'Debug' && github.ref_name == github.event.repository.default_branch
       id: deps-save-cache
-      uses: actions/cache/save@v4
+      uses: actions/cache/save@v5
       with:
         path: ${{ env.DEPS_DIR }}
         key: ${{ steps.deps-restore-cache.outputs.cache-primary-key }}
@@ -336,6 +336,6 @@ jobs:
 
     - name: Codecov Upload
       if: steps.build-test.outputs.coverage_file
-      uses: codecov/codecov-action@v2
+      uses: codecov/codecov-action@v7
       with:
         files: ${{ steps.build-test.outputs.coverage_file }}
