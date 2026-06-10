@@ -609,6 +609,11 @@ void StructuredColumns::gather(const FieldSet& local_fieldset, FieldSet& global_
             parallel::Field<long> glb_field(make_leveled_view<long>(glb));
             gather().gather(&loc_field, &glb_field, nb_fields, root);
         }
+        else if (loc.datatype() == array::DataType::kind<unsigned long>()) {
+            parallel::Field<unsigned long const> loc_field(make_leveled_view<const unsigned long>(loc));
+            parallel::Field<unsigned long> glb_field(make_leveled_view<unsigned long>(glb));
+            gather().gather(&loc_field, &glb_field, nb_fields, root);
+        }
         else if (loc.datatype() == array::DataType::kind<float>()) {
             parallel::Field<float const> loc_field(make_leveled_view<const float>(loc));
             parallel::Field<float> glb_field(make_leveled_view<float>(glb));
