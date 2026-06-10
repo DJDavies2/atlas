@@ -29,7 +29,16 @@ if( HAVE_FCTEST )
     SOURCES         fctest_blockstructuredcolumns.F90
     LIBS            atlas_f
     ENVIRONMENT ${ATLAS_TEST_ENVIRONMENT}
-)
+  )
+
+  add_fctest( TARGET atlas_fctest_blockstructuredcolumns_checksum
+    MPI             2
+    CONDITION       eckit_HAVE_MPI AND MPI_SLOTS GREATER_EQUAL 2
+    LINKER_LANGUAGE Fortran
+    SOURCES         fctest_blockstructuredcolumns_checksum.F90
+    LIBS            atlas_f
+    ENVIRONMENT ${ATLAS_TEST_ENVIRONMENT}
+  )
 
 endif()
 
