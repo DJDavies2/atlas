@@ -653,19 +653,19 @@ field_1 = atlas_Field(name="field_1", data=gfl(:,:,1,:))
 checksum = fs%checksum(field_1)  ! Should compute checksum without error on wrapped data
 write(msg,*) "Checksum for field_1 wrapping 3D slice: ", trim(checksum)
 call atlas_log%info(msg)
-FCTEST_CHECK_EQUAL(checksum, "35704")
+FCTEST_CHECK_EQUAL(checksum, "8b78")
 
 field_2 = atlas_Field(name="field_2", data=gfl(:,:,2,:))
 checksum = fs%checksum(field_2)  ! Should compute checksum without error on wrapped data
 write(msg,*) "Checksum for field_2 wrapping 3D slice: ", trim(checksum)
 call atlas_log%info(msg)
-FCTEST_CHECK_EQUAL(checksum, "12704")
+FCTEST_CHECK_EQUAL(checksum, "31a0")
 
 field_3 = atlas_Field(name="field_3", data=gfl(:,:,3,:))
 checksum = fs%checksum(field_3)  ! Should compute checksum without error on wrapped data
 write(msg,*) "Checksum for field_3 wrapping 3D slice: ", trim(checksum)
 call atlas_log%info(msg)
-FCTEST_CHECK_EQUAL(checksum, "21654")
+FCTEST_CHECK_EQUAL(checksum, "5496")
 
 fieldset = atlas_FieldSet()
 call fieldset%add(field_1)
@@ -674,13 +674,13 @@ call fieldset%add(field_3)
 checksum = fs%checksum(fieldset)  ! Should compute checksum without error on fieldset of wrapped fields
 write(msg,*) "Checksum for fieldset of 3 wrapped fields: ", trim(checksum)
 call atlas_log%info(msg)
-FCTEST_CHECK_EQUAL(checksum, "37637")
+FCTEST_CHECK_EQUAL(checksum, "9305")
 
 field_gfl = atlas_Field(name="gfl", data=gfl(:,:,:,:))
 checksum = fs%checksum(field_gfl)  ! Should compute checksum without error on wrapped data
 write(msg,*) "Checksum for field_gfl wrapping 4D array: ", trim(checksum)
 call atlas_log%info(msg)
-FCTEST_CHECK_EQUAL(checksum, "13196")
+FCTEST_CHECK_EQUAL(checksum, "338c")
 END_TEST
 
 END_TESTSUITE

@@ -561,12 +561,12 @@ util::checksum_t fieldset_checksum(const BlockStructuredColumns& fs, const Field
 
 std::string BlockStructuredColumns::checksum(const Field& f) const {
     ATLAS_TRACE("BlockStructuredColumns::checksum");
-    return std::to_string(field_checksum(*this, f));
+    return util::checksum_to_hex_str(field_checksum(*this, f));
 }
 
 std::string BlockStructuredColumns::checksum(const FieldSet& f) const {
     ATLAS_TRACE("BlockStructuredColumns::checksum");
-    return std::to_string(fieldset_checksum(*this, f));
+    return util::checksum_to_hex_str(fieldset_checksum(*this, f));
 }
 
 // ----------------------------------------------------------------------------

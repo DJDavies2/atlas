@@ -101,7 +101,7 @@ std::string fill_field_and_expected_checksum(const BlockStructuredColumns& fs, F
         }
     }
 
-    return std::to_string(util::checksum(lane_checksums.data(), lane_checksums.size()));
+    return util::checksum_to_hex_str(util::checksum(lane_checksums.data(), lane_checksums.size()));
 }
 
 template <typename Value>
@@ -145,7 +145,7 @@ std::string expected_fieldset_checksum(const BlockStructuredColumns& fs, const F
     for (size_t jlane = 0; jlane < lane_states.size(); ++jlane) {
         lane_digests[jlane] = util::checksum_digest(lane_states[jlane]);
     }
-    return std::to_string(util::checksum(lane_digests.data(), lane_digests.size()));
+    return util::checksum_to_hex_str(util::checksum(lane_digests.data(), lane_digests.size()));
 }
 
 template <typename Value>
@@ -402,8 +402,9 @@ CASE("test_BlockStructuredColumns checksum in mpi-serial uses generic path for b
 
     fs.scatter(global, local);
 
-    Log::info() << "Expected checksum: " << expected_checksum << std::endl;
-    EXPECT_EQ(fs.checksum(local), std::to_string(expected_checksum));
+    auto expected_checksum_hex_str = util::checksum_to_hex_str(expected_checksum);
+    Log::info() << "Expected checksum: " << expected_checksum_hex_str << std::endl;
+    EXPECT_EQ(fs.checksum(local), expected_checksum_hex_str);
 }
 
 CASE("test_BlockStructuredColumns checksum(fieldset) matches checksum(field) for a single field (mpi-serial)") {
@@ -498,8 +499,9 @@ void run_mpi_checksum_caseT(const functionspace::BlockStructuredColumns& fs, idx
     idx_t expected_rank = idx_t{2} /*nblks, nproma*/ + std::min<idx_t>(nlev,1) + std::min<idx_t>(nvar,1);
     EXPECT_EQ(local.rank(), expected_rank);
 
-    Log::info() << "Expected checksum: " << expected_checksum << std::endl;
-    EXPECT_EQ(fs.checksum(local), std::to_string(expected_checksum));
+    auto expected_checksum_hex_str = util::checksum_to_hex_str(expected_checksum);
+    Log::info() << "Expected checksum: " << expected_checksum_hex_str << std::endl;
+    EXPECT_EQ(fs.checksum(local), expected_checksum_hex_str);
 };
 
 void run_mpi_checksum_cases(const functionspace::BlockStructuredColumns& fs, idx_t nlev, idx_t nvar) {
@@ -545,8 +547,9 @@ void run_mpi_fieldset_checksum_caseT(const functionspace::BlockStructuredColumns
     local_fieldset.add(local_a);
     local_fieldset.add(local_b);
 
-    Log::info() << "Expected fieldset checksum (MPI): " << expected_fieldset << std::endl;
-    EXPECT_EQ(fs.checksum(local_fieldset), std::to_string(expected_fieldset));
+    auto expected_fieldset_hex_str = util::checksum_to_hex_str(expected_fieldset);
+    Log::info() << "Expected fieldset checksum (MPI): " << expected_fieldset_hex_str << std::endl;
+    EXPECT_EQ(fs.checksum(local_fieldset), expected_fieldset_hex_str);
 }
 
 void run_mpi_fieldset_checksum_cases(const functionspace::BlockStructuredColumns& fs, idx_t nlev, idx_t nvar) {
