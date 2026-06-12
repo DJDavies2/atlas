@@ -104,13 +104,6 @@ static uint16_t fletcher16(const uint8_t* data, size_t size) {
   return fletcher16_finish(checksum);
 }
 
-
-}  // namespace
-
-void checksum_reset(checksum_t& checksum) {
-  fletcher16_reset(reinterpret_cast<Fletcher16&>(checksum));
-}
-
 static void checksum_update(checksum_t& checksum, const char* data, size_t bytes) {
   fletcher16_update(reinterpret_cast<Fletcher16&>(checksum), reinterpret_cast<const uint8_t*>(data), bytes);
 }
@@ -124,12 +117,14 @@ static void checksum_update_strided(checksum_t& checksum, const Value values[], 
   fletcher16_update(f, data, size, stride_bytes, value_bytes);
 }
 
-checksum_t checksum_digest(const checksum_t& checksum) {
-    return fletcher16_finish(reinterpret_cast<const Fletcher16&>(checksum));
-}
-
 static checksum_t checksum(const char* data, size_t size) {
     return fletcher16(reinterpret_cast<const uint8_t*>(data), size / sizeof(uint8_t));
+}
+
+}  // namespace
+
+void checksum_reset(checksum_t& checksum) {
+  fletcher16_reset(reinterpret_cast<Fletcher16&>(checksum));
 }
 
 checksum_t checksum(const int values[], size_t size) {
@@ -190,6 +185,28 @@ void checksum_update(checksum_t& c, const double values[], size_t size, size_t s
 
 void checksum_update(checksum_t& c, const checksum_t values[], size_t size, size_t stride) {
   checksum_update_strided(c, values, size, stride);
+}
+
+checksum_t checksum_digest(const checksum_t& checksum) {
+    return fletcher16_finish(reinterpret_cast<const Fletcher16&>(checksum));
+}
+
+namespace {
+inline std::string to_hex_str(util::checksum_t digest) {
+  // Configure the stream for hex, lowercase, and zero padding
+
+  std::stringstream ss;
+  ss << std::hex
+      << std::nouppercase
+      << std::setw(4)
+      << std::setfill('0')
+      << digest;
+  return ss.str();
+}
+}
+
+std::string checksum_to_hex_str(const util::checksum_t& digest) {
+  return to_hex_str(digest);
 }
 
 }  // namespace util
