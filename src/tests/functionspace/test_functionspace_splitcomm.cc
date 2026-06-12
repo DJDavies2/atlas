@@ -39,20 +39,22 @@ int color() {
 }
 
 Grid grid() {
-    static Grid g (color() == 0 ? "O32" : "N32" );
-    return g;
+    return Grid(color() == 0 ? "O32" : "N32" );
 }
 
 std::string expected_checksum() {
-    if (grid().name()=="O32") {
-        return "75e913d400755a0d2782fc65e2035e97";
-    }
-    else if (grid().name()=="N32") {
-        return "bcb344196d20becbb66f098d91f83abb";
-    }
-    else {
-        return "unknown";
-    }
+    static std::string result = [&]() {
+        if (grid().name()=="O32") {
+            return "75e913d400755a0d2782fc65e2035e97";
+        }
+        else if (grid().name()=="N32") {
+            return "bcb344196d20becbb66f098d91f83abb";
+        }
+        else {
+            return "unknown";
+        }
+    }();
+    return result;
 }
 
 struct Fixture {
@@ -106,11 +108,14 @@ CASE("test FunctionSpace NodeColumns") {
     auto checksum = fs.checksum(field);
     EXPECT_EQ(checksum, expected_checksum());
 
+    Log::error() << "fs.part() = " << fs.part() << " fs.nb_parts() = " << fs.nb_parts() << " grid = " << fs.grid().name() << " checksum = " << checksum << std::endl;
+
     // Output
-    output::Gmsh gmsh(grid().name()+".msh");
+    output::Gmsh gmsh(mesh.grid().name()+".msh");
     gmsh.write(mesh);
     gmsh.write(field);
 }
+
 
 CASE("test FunctionSpace StructuredColumns") {
     Fixture fixture;
@@ -140,6 +145,8 @@ CASE("test FunctionSpace StructuredColumns") {
     // Checksum
     auto checksum = fs.checksum(field);
     EXPECT_EQ(checksum, expected_checksum());
+
+    Log::error() << "fs.part() = " << fs.part() << " fs.nb_parts() = " << fs.nb_parts() << " grid = " << fs.grid().name() << " checksum = " << checksum << std::endl;
 }
 
 CASE("test FunctionSpace BlockStructuredColumns") {
@@ -208,9 +215,9 @@ CASE("test FunctionSpace PointCloud") {
 
 CASE("test FunctionSpace StructuredColumns with MatchingPartitioner") {
     Fixture fixture;
-
-    auto fs_A = functionspace::StructuredColumns(grid(), option::mpi_split_comm());
-    auto fs_B = functionspace::StructuredColumns(grid(), grid::MatchingPartitioner(fs_A), option::mpi_split_comm());
+    auto g = grid();
+    auto fs_A = functionspace::StructuredColumns(g, option::mpi_split_comm());
+    auto fs_B = functionspace::StructuredColumns(g, grid::MatchingPartitioner(fs_A), option::mpi_split_comm());
     fs_A.polygon().outputPythonScript("fs_A_polygons.py");
     fs_B.polygon().outputPythonScript("fs_B_polygons.py");
 }
