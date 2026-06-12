@@ -57,6 +57,20 @@ std::string expected_checksum() {
     return result;
 }
 
+std::string expected_checksum_blocked() {
+    static std::string result = [&]() {
+        if (grid().name()=="O32") {
+            return "6408";
+        }
+        else if (grid().name()=="N32") {
+            return "ca85";
+        }
+        else {
+            return "unknown";
+        }
+    }();
+    return result;
+}
 struct Fixture {
     Fixture() {
         mpi::comm().split(color(),"split");
@@ -70,8 +84,20 @@ struct Fixture {
 
 void field_init(Field& field) {
     auto fs = field.functionspace();
-    auto f = array::make_view<double,1>(field);
     auto g = array::make_view<gidx_t,1>(fs.global_index());
+
+    if (functionspace::BlockStructuredColumns fsb{fs}) {
+        auto f = array::make_view<double,2>(field);
+        auto g = array::make_view<gidx_t,1>(fs.global_index());
+        for( idx_t jblk=0; jblk<fsb.nblks(); ++jblk ) {
+            auto block = fsb.block(jblk);
+            for( idx_t jlane=0; jlane<block.size(); ++jlane ) {
+                f(jblk,jlane) = g(block.index(jlane));
+            }
+        }
+        return;
+    }
+    auto f = array::make_view<double,1>(field);
     for( idx_t j=0; j<f.size(); ++j ) {
         f(j) = g(j);
     }
@@ -157,7 +183,7 @@ CASE("test FunctionSpace BlockStructuredColumns") {
     EXPECT_EQUAL(fs.nb_parts(),mpi::comm("split").size());
 
     auto field  = fs.createField<double>();
-    // field_init(field);
+    field_init(field);
 
     // HaloExchange
     // field.haloExchange();
@@ -165,18 +191,20 @@ CASE("test FunctionSpace BlockStructuredColumns") {
 
     // Gather
     auto fieldg = fs.createField<double>(atlas::option::global());
-    // fs.gather(field,fieldg);
+    fs.gather(field,fieldg);
 
-    // if (fieldg.size()) {
-    //     idx_t g{0};
-    //     field::for_each_value(fieldg,[&](double x) {
-    //         EXPECT_EQ(++g,x);
-    //     });
-    // }
+    if (fieldg.size()) {
+        idx_t g{0};
+        field::for_each_value(fieldg,[&](double x) {
+            EXPECT_EQ(++g,x);
+        });
+    }
 
-    // // Checksum
-    // auto checksum = fs.checksum(field);
-    // EXPECT_EQ(checksum, expected_checksum());
+    // Checksum
+    auto checksum = fs.checksum(field);
+    EXPECT_EQ(checksum, expected_checksum_blocked());
+
+    Log::error() << "fs.part() = " << fs.part() << " fs.nb_parts() = " << fs.nb_parts() << " grid = " << fs.grid().name() << " checksum = " << checksum << std::endl;
 }
 
 //-----------------------------------------------------------------------------
