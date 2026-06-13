@@ -123,9 +123,11 @@ public:
 private:
     static Base::key_type key(const detail::StructuredColumns& funcspace) {
         std::ostringstream key;
-        key << "grid[address=" << funcspace.grid().get() << ",halo=" << funcspace.halo()
+        key << "grid[name=" << funcspace.grid().name() << ",address=" << funcspace.grid().get() << "]"
+            << "functionspace[halo=" << funcspace.halo()
             << ",periodic_points=" << std::boolalpha << funcspace.periodic_points_
-            << ",distribution=" << funcspace.distribution() << "]";
+            << ",distribution=" << funcspace.distribution() << "]"
+            << ",comm[name=" << funcspace.mpi_comm() << ",address=" << &mpi::comm(funcspace.mpi_comm()) << "]";
         return key.str();
     }
 
@@ -172,9 +174,11 @@ public:
 private:
     static Base::key_type key(const detail::StructuredColumns& funcspace) {
         std::ostringstream key;
-        key << "grid[address=" << funcspace.grid().get() << ",halo=" << funcspace.halo()
+        key << "grid[name=" << funcspace.grid().name() << ",address=" << funcspace.grid().get() << "]"
+            << "functionspace[halo=" << funcspace.halo()
             << ",periodic_points=" << std::boolalpha << funcspace.periodic_points_
-            << ",distribution=" << funcspace.distribution() << "]";
+            << ",distribution=" << funcspace.distribution() << "]"
+            << ",comm[name=" << funcspace.mpi_comm() << ",address=" << &mpi::comm(funcspace.mpi_comm()) << "]";
         return key.str();
     }
 
@@ -190,7 +194,6 @@ private:
 
     static value_type* create(const detail::StructuredColumns* funcspace) {
         value_type* value = new value_type();
-
         value->setup(funcspace->mpi_comm(),
                      array::make_view<int, 1>(funcspace->partition()).data(),
                      array::make_view<idx_t, 1>(funcspace->remote_index()).data(), REMOTE_IDX_BASE,

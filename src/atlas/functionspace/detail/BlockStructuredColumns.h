@@ -125,6 +125,8 @@ public:
 
     const util::PartitionPolygon& polygon(idx_t halo = 0) const override { return structuredcolumns_->polygon(halo); }
 
+    std::string mpi_comm() const override { return structuredcolumns_->mpi_comm(); }
+
 private:  // methods
     array::ArrayShape config_shape(const eckit::Configuration&) const;
     array::ArrayAlignment config_alignment(const eckit::Configuration&) const;

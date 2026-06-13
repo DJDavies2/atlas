@@ -521,7 +521,9 @@ util::checksum_t checksum_from_lane_states(const BlockStructuredColumns& fs, Che
         }
     }
 
-    if (mpi::comm().size() == 1) {
+    auto& mpi_comm = mpi::comm(fs.mpi_comm());
+
+    if (mpi_comm.size() == 1) {
         ATLAS_ASSERT(local_lane_checksums.contiguous());
         const auto* local_lane_checksums_data = local_lane_checksums.array().host_data<util::checksum_t>();
         return util::checksum(local_lane_checksums_data, static_cast<size_t>(fs.structuredcolumns().sizeOwned()));
@@ -531,12 +533,12 @@ util::checksum_t checksum_from_lane_states(const BlockStructuredColumns& fs, Che
     fs.gather(local_lane_checksums, global_lane_checksums);
 
     util::checksum_t global_checksum = 0;
-    if (mpi::comm().rank() == checksum_data.root) {
+    if (mpi_comm.rank() == checksum_data.root) {
         ATLAS_ASSERT(global_lane_checksums.contiguous());
         const auto* global_lane_checksums_data = global_lane_checksums.array().host_data<util::checksum_t>();
         global_checksum = util::checksum(global_lane_checksums_data, global_lane_checksums.size());
     }
-    mpi::comm().broadcast(global_checksum, checksum_data.root);
+    mpi_comm.broadcast(global_checksum, checksum_data.root);
     return global_checksum;
 }
 
@@ -559,12 +561,12 @@ util::checksum_t fieldset_checksum(const BlockStructuredColumns& fs, const Field
 
 std::string BlockStructuredColumns::checksum(const Field& f) const {
     ATLAS_TRACE("BlockStructuredColumns::checksum");
-    return std::to_string(field_checksum(*this, f));
+    return util::checksum_to_hex_str(field_checksum(*this, f));
 }
 
 std::string BlockStructuredColumns::checksum(const FieldSet& f) const {
     ATLAS_TRACE("BlockStructuredColumns::checksum");
-    return std::to_string(fieldset_checksum(*this, f));
+    return util::checksum_to_hex_str(fieldset_checksum(*this, f));
 }
 
 // ----------------------------------------------------------------------------
