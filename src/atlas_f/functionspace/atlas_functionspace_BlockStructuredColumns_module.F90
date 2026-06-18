@@ -152,13 +152,13 @@ function empty_config() result(config)
   call config%return()
 end function
 
-function ctor_grid(grid, halo, nproma, levels) result(this)
+function ctor_grid(grid, nproma, halo, levels) result(this)
   use atlas_functionspace_BlockStructuredColumns_c_binding
   type(atlas_functionspace_BlockStructuredColumns) :: this
   class(atlas_Grid), intent(in) :: grid
-  integer, optional :: halo
-  integer, optional :: nproma
-  integer, optional :: levels
+  integer, optional, intent(in) :: nproma
+  integer, optional, intent(in) :: halo
+  integer, optional, intent(in) :: levels
   type(atlas_Config) :: config
   config = empty_config() ! Due to PGI compiler bug, we have to do this instead of "config = atlas_Config()""
   if( present(halo) )   call config%set("halo",halo)
@@ -183,15 +183,17 @@ function ctor_grid_config(grid, config) result(this)
   call this%return()
 end function
 
-function ctor_grid_dist(grid, distribution, halo, levels) result(this)
+function ctor_grid_dist(grid, distribution, nproma, halo, levels) result(this)
   use atlas_functionspace_BlockStructuredColumns_c_binding
   type(atlas_functionspace_BlockStructuredColumns) :: this
   class(atlas_Grid), intent(in) :: grid
   type(atlas_griddistribution), intent(in) :: distribution
-  integer, optional :: halo
-  integer, optional :: levels
+  integer, optional, intent(in) :: halo
+  integer, optional, intent(in) :: nproma
+  integer, optional, intent(in) :: levels
   type(atlas_Config) :: config
   config = empty_config() ! Due to PGI compiler bug, we have to do this instead of "config = atlas_Config()""
+  if( present(nproma) ) call config%set("nproma",nproma)
   if( present(halo) )   call config%set("halo",halo)
   if( present(levels) ) call config%set("levels",levels)
   call this%reset_c_ptr( atlas__functionspace__BStructuredColumns__new__grid_dist( &
@@ -201,17 +203,19 @@ function ctor_grid_dist(grid, distribution, halo, levels) result(this)
   call this%return()
 end function
 
-function ctor_grid_dist_levels(grid, distribution, levels, halo) result(this)
+function ctor_grid_dist_levels(grid, distribution, levels, nproma, halo) result(this)
   use atlas_functionspace_BlockStructuredColumns_c_binding
   type(atlas_functionspace_BlockStructuredColumns) :: this
   class(atlas_Grid), intent(in) :: grid
   type(atlas_griddistribution), intent(in) :: distribution
-  integer, optional :: halo
-  real(c_double) :: levels(:)
+  integer, optional, intent(in) :: halo
+  integer, optional, intent(in) :: nproma
+  real(c_double), intent(in) :: levels(:)
   type(atlas_Config) :: config
   type(atlas_Vertical) :: vertical
   config = empty_config() ! Due to PGI compiler bug, we have to do this insted of "config = atlas_Config()""
   if( present(halo) )   call config%set("halo",halo)
+  if( present(nproma) ) call config%set("nproma",nproma)
   call config%set("levels",size(levels))
   vertical = atlas_Vertical(levels)
   call this%reset_c_ptr( atlas__functionspace__BStructuredColumns__new__grid_dist_vert( &
@@ -223,16 +227,18 @@ function ctor_grid_dist_levels(grid, distribution, levels, halo) result(this)
   call this%return()
 end function
 
-function ctor_grid_dist_vertical(grid, distribution, vertical, halo) result(this)
+function ctor_grid_dist_vertical(grid, distribution, vertical, nproma, halo) result(this)
   use atlas_functionspace_BlockStructuredColumns_c_binding
   type(atlas_functionspace_BlockStructuredColumns) :: this
   class(atlas_Grid), intent(in) :: grid
   type(atlas_griddistribution), intent(in) :: distribution
-  integer, optional :: halo
-  type(atlas_Vertical) :: vertical
+  integer, optional, intent(in) :: halo
+  integer, optional, intent(in) :: nproma
+  type(atlas_Vertical), intent(in) :: vertical
   type(atlas_Config) :: config
   config = empty_config() ! Due to PGI compiler bug, we have to do this insted of "config = atlas_Config()""
   if( present(halo) )   call config%set("halo",halo)
+  if( present(nproma) ) call config%set("nproma",nproma)
   call config%set("levels",vertical%size())
   call this%reset_c_ptr( atlas__functionspace__BStructuredColumns__new__grid_dist_vert( &
       & grid%c_ptr(), distribution%c_ptr(), vertical%c_ptr(), &
@@ -256,16 +262,18 @@ function ctor_grid_dist_config(grid, distribution, config) result(this)
 end function
 
 
-function ctor_grid_part(grid, partitioner, halo, levels) result(this)
+function ctor_grid_part(grid, partitioner, halo, nproma, levels) result(this)
   use atlas_functionspace_BlockStructuredColumns_c_binding
   type(atlas_functionspace_BlockStructuredColumns) :: this
   class(atlas_Grid), intent(in) :: grid
   type(atlas_Partitioner), intent(in) :: partitioner
-  integer, optional :: halo
-  integer, optional :: levels
+  integer, optional, intent(in) :: halo
+  integer, optional, intent(in) :: nproma
+  integer, optional, intent(in) :: levels
   type(atlas_Config) :: config
   config = empty_config() ! Due to PGI compiler bug, we have to do this instead of "config = atlas_Config()""
   if( present(halo) )   call config%set("halo",halo)
+  if( present(nproma) ) call config%set("nproma",nproma)
   if( present(levels) ) call config%set("levels",levels)
   call this%reset_c_ptr( atlas__functionspace__BStructuredColumns__new__grid_part( &
       & grid%c_ptr(), partitioner%c_ptr(), config%c_ptr() ) )
@@ -274,17 +282,19 @@ function ctor_grid_part(grid, partitioner, halo, levels) result(this)
   call this%return()
 end function
 
-function ctor_grid_part_levels(grid, partitioner, levels, halo) result(this)
+function ctor_grid_part_levels(grid, partitioner, levels, nproma, halo) result(this)
   use atlas_functionspace_BlockStructuredColumns_c_binding
   type(atlas_functionspace_BlockStructuredColumns) :: this
   class(atlas_Grid), intent(in) :: grid
   type(atlas_Partitioner), intent(in) :: partitioner
-  integer, optional :: halo
-  real(c_double) :: levels(:)
+  integer, optional, intent(in) :: halo
+  integer, optional, intent(in) :: nproma
+  real(c_double), intent(in) :: levels(:)
   type(atlas_Config) :: config
   type(atlas_Vertical) :: vertical
   config = empty_config() ! Due to PGI compiler bug, we have to do this insted of "config = atlas_Config()""
   if( present(halo) )   call config%set("halo",halo)
+  if( present(nproma) ) call config%set("nproma",nproma)
   call config%set("levels",size(levels))
   vertical = atlas_Vertical(levels)
   call this%reset_c_ptr( atlas__functionspace__BStructuredColumns__new__grid_part_vert( &
@@ -296,15 +306,17 @@ function ctor_grid_part_levels(grid, partitioner, levels, halo) result(this)
   call this%return()
 end function
 
-function ctor_grid_part_vertical(grid, partitioner, vertical, halo) result(this)
+function ctor_grid_part_vertical(grid, partitioner, vertical, nproma, halo) result(this)
   use atlas_functionspace_BlockStructuredColumns_c_binding
   type(atlas_functionspace_BlockStructuredColumns) :: this
   class(atlas_Grid), intent(in) :: grid
   type(atlas_Partitioner), intent(in) :: partitioner
-  integer, optional :: halo
+  integer, optional, intent(in) :: nproma
+  integer, optional, intent(in) :: halo
   type(atlas_Vertical) :: vertical
   type(atlas_Config) :: config
   config = empty_config() ! Due to PGI compiler bug, we have to do this insted of "config = atlas_Config()""
+  if( present(nproma) ) call config%set("nproma",nproma)
   if( present(halo) )   call config%set("halo",halo)
   call config%set("levels",vertical%size())
   call this%reset_c_ptr( atlas__functionspace__BStructuredColumns__new__grid_part_vert( &

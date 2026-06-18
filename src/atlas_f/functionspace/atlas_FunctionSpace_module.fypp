@@ -47,6 +47,11 @@ TYPE, extends(fckit_owned_object) :: atlas_FunctionSpace
 !------------------------------------------------------------------------------
 contains
   procedure, public :: name => atlas_FunctionSpace__name
+  procedure, public :: lonlat
+  procedure, public :: ghost
+  procedure, public :: global_index
+  procedure, public :: remote_index
+  procedure, public :: partition
 
   procedure, private :: create_field_args
   procedure, private :: create_field_template
@@ -120,6 +125,46 @@ function atlas_FunctionSpace__name(this) result(name)
   call atlas__FunctionSpace__name(this%c_ptr(), name_c_str, size )
   name = c_ptr_to_string(name_c_str)
   call c_ptr_free(name_c_str)
+end function
+
+function lonlat(this) result(field)
+  use atlas_functionspace_c_binding
+  type(atlas_Field) :: field
+  class(atlas_Functionspace), intent(in) :: this
+  field = atlas_Field( atlas__FunctionSpace__lonlat(this%c_ptr()) )
+  call field%return()
+end function
+
+function ghost(this) result(field)
+  use atlas_functionspace_c_binding
+  type(atlas_Field) :: field
+  class(atlas_Functionspace), intent(in) :: this
+  field = atlas_Field( atlas__FunctionSpace__ghost(this%c_ptr()) )
+  call field%return()
+end function
+
+function global_index(this) result(field)
+  use atlas_functionspace_c_binding
+  type(atlas_Field) :: field
+  class(atlas_Functionspace), intent(in) :: this
+  field = atlas_Field( atlas__FunctionSpace__global_index(this%c_ptr()) )
+  call field%return()
+end function
+
+function remote_index(this) result(field)
+  use atlas_functionspace_c_binding
+  type(atlas_Field) :: field
+  class(atlas_Functionspace), intent(in) :: this
+  field = atlas_Field( atlas__FunctionSpace__remote_index(this%c_ptr()) )
+  call field%return()
+end function
+
+function partition(this) result(field)
+  use atlas_functionspace_c_binding
+  type(atlas_Field) :: field
+  class(atlas_Functionspace), intent(in) :: this
+  field = atlas_Field( atlas__FunctionSpace__partition(this%c_ptr()) )
+  call field%return()
 end function
 
 
