@@ -321,6 +321,12 @@ jobs:
         # Only add --oversubscribe arg for openmpi
         [ -z ${I_MPI_ROOT+x} ] && echo "ATLAS_RUN_MPI_ARGS=--oversubscribe" >> $GITHUB_ENV
 
+        # Stop Intel MPI from attempting an unsupported backend
+        if [ -n "${I_MPI_ROOT+x}" ]; then
+          echo "I_MPI_FABRICS=tcp" >> $GITHUB_ENV
+          echo "FI_PROVIDER=tcp"   >> $GITHUB_ENV
+        fi
+
         # Add mpirun to path for testing
         [ -z ${MPI_HOME+x} ] || echo "${MPI_HOME}/bin" >> $GITHUB_PATH
 
