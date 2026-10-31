@@ -3,6 +3,7 @@ name = "atlas"
 repo = "ecmwf/atlas"
 visibility = "public"
 compiler-inputs = ["cxx-compiler"]
+allow-stale-deps = true
 
 [[deps]]
 repo = "ecmwf/ecbuild"
@@ -53,7 +54,7 @@ when = { options = "mpi-gpu" }
 [matrix.build.defaults]
 job-script = "./.ci/build.sh.j2"
 build-type = "RelWithDebInfo"
-runs-on = "arc-runner-very-large"
+runs-on = "arc-runner-large"
 options = ""
 
 [[matrix.build.include]]
@@ -200,6 +201,7 @@ modules = ["load prgenv/nvidia", "unload nvidia", "load nvidia/26.1", "load cmak
 c-compiler-binary = "nvc"
 cxx-compiler-binary = "nvc++"
 fortran-compiler-binary = "nvfortran"
+sccache = false
 ntasks = 16
 
 # One full GPU node; the gpu partition has no ssdtmp.
@@ -212,6 +214,7 @@ modules = ["load prgenv/nvidia", "unload nvidia", "load nvidia/26.1", "load cmak
 c-compiler-binary = "nvc"
 cxx-compiler-binary = "nvc++"
 fortran-compiler-binary = "nvfortran"
+sccache = false
 qos = "ng"
 ntasks = 4
 cpus-per-task = 64
@@ -257,7 +260,7 @@ publishes = false
 
 [[matrix.rust-publish.include]]
 job-script = "./.ci/rust-publish.sh.j2"
-runs-on = "arc-runner-very-large"
+runs-on = "arc-runner-large"
 cxx-compiler = "g++-13"
 c-compiler = "gcc-13"
 rust-compiler = "rust-1.90"
